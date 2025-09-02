@@ -1,0 +1,21 @@
+{
+	"name": "ai-review",
+	"private": true,
+	"workspaces": [
+		"app",
+		".github/actions/ai-review"
+	],
+	"scripts": {
+		"dev:app": "cd app && node --watch --inspect src/server.js",
+		"test": "node --test"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "2.2.0"
+	},
+	"dependencies": {
+		"@octokit/app": "^15.0.0",
+		"dotenv": "^16.4.5",
+		"express": "^4.19.2",
+		"@octokit/webhooks": "^12.0.0"
+	}
+}

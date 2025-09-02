@@ -1,0 +1,22 @@
+name: "ai-review"
+description: "AI review runner"
+inputs:
+  message:
+    description: "Fallback greeting"
+    required: false
+    default: "👋 AI review queued."
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/setup-node@v4
+      with: { node-version: 24.x }
+    - run: npm ci
+      shell: bash
+      working-directory: ${{ github.action_path }}
+    - run: node src/index.mjs
+      shell: bash
+      working-directory: ${{ github.action_path }}
+      env:
+        GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
+        INPUT_MESSAGE: ${{ inputs.message }}
+        LLM_API_KEY: ${{ env.LLM_API_KEY }}
