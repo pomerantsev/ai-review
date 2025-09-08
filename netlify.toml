@@ -1,6 +1,6 @@
 [build]
   functions = "netlify/functions"
-  publish = "public"
+  publish = "."
 
 [functions]
   node_bundler = "esbuild"
