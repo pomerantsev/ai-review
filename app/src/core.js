@@ -72,6 +72,34 @@ export async function handle({ headers, body }) {
     headers: { 'X-GitHub-Api-Version': '2022-11-28' },
   });
 
-  // (Later: repository_dispatch from here)
+  const deliveryId = getHeader(headers, 'x-github-delivery');
+  let dispatchStatus = 'success';
+  try {
+    await octokit.request('POST /repos/{owner}/{repo}/dispatches', {
+      owner,
+      repo,
+      event_type: 'ai.review',
+      client_payload: {
+        owner,
+        repo,
+        pr_number: payload.issue.number,
+        head_sha: headSha,
+        requested_by: username,
+      },
+      headers: { 'X-GitHub-Api-Version': '2022-11-28' },
+    });
+  } catch (err) {
+    dispatchStatus = 'failure';
+    console.error('Dispatch error:', err);
+  }
+  console.log(
+    JSON.stringify({
+      delivery_id: deliveryId,
+      repo,
+      pr_number: payload.issue.number,
+      dispatch_status: dispatchStatus,
+    }),
+  );
+
   return { status: 200, body: 'ok' };
 }
