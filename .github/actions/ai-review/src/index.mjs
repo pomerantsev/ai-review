@@ -9,6 +9,7 @@ core.info(`Received PR #${prNumber} with head_sha ${headSha}`);
 
 const token = process.env.GITHUB_TOKEN;
 const octokit = github.getOctokit(token);
+const llmApiKey = process.env.LLM_API_KEY;
 
 if (prNumber && payload.repository) {
   // Fetch PR metadata
