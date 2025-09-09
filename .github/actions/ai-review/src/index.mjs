@@ -1,5 +1,6 @@
 import * as core from '@actions/core';
 import * as github from '@actions/github';
+import Anthropic from '@anthropic-ai/sdk';
 
 const payload = github.context.payload;
 const prNumber = payload.client_payload?.pr_number;
@@ -46,29 +47,20 @@ if (prNumber && payload.repository) {
 
   core.info(`Prepared prompt for Claude: ${prompt}`);
 
-  // Call Claude API (Anthropic example endpoint)
-  const response = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'x-api-key': llmApiKey,
-      'content-type': 'application/json',
-      'anthropic-version': '2023-06-01',
-    },
-    body: JSON.stringify({
-      model: 'claude-3-opus-20240229', // or your preferred model
+  const anthropic = new Anthropic({ apiKey: llmApiKey });
+
+  let aiReview;
+  try {
+    const message = await anthropic.messages.create({
+      model: 'claude-sonnet-4-20250514', // or your preferred model
       max_tokens: 1024,
       messages: [{ role: 'user', content: prompt }],
-    }),
-  });
-
-  if (!response.ok) {
-    const errText = await response.text();
-    core.setFailed(`Claude API error: ${errText}`);
+    });
+    aiReview = message.content?.[0]?.text || 'No response from Claude.';
+  } catch (err) {
+    core.setFailed(`Claude SDK error: ${err instanceof Error ? err.message : String(err)}`);
     process.exit(1);
   }
-
-  const data = await response.json();
-  const aiReview = data.content?.[0]?.text || 'No response from Claude.';
 
   // Post the AI review as a comment
   const commentBody = [
