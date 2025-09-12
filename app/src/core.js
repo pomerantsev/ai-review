@@ -63,12 +63,13 @@ export async function handle({ headers, body }) {
   });
 
   const headSha = pr.head?.sha || 'unknown';
-  const short = headSha.slice(0, 7);
-  await octokit.request('POST /repos/{owner}/{repo}/issues/{issue_number}/comments', {
+  
+  // Add eyes emoji reaction to the triggering comment
+  await octokit.request('POST /repos/{owner}/{repo}/issues/comments/{comment_id}/reactions', {
     owner,
     repo,
-    issue_number: payload.issue.number, // PR number
-    body: `Queued AI review for \`${short}\`…`,
+    comment_id: payload.comment.id,
+    content: 'eyes',
     headers: { 'X-GitHub-Api-Version': '2022-11-28' },
   });
 
